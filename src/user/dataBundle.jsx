@@ -1,0 +1,2193 @@
+import React, { useState, useMemo } from "react";
+import "./dataBundle.css";
+import "./dashboard.css";
+
+
+/* -------------------------------------------------------------------------- */
+/* Static data — replace with API data when wiring up the backend             */
+/* -------------------------------------------------------------------------- */
+
+const NETWORKS = [
+  { id: "mtn", name: "MTN", color: "#FFCB05", initials: "MTN" },
+  { id: "airtel", name: "Airtel", color: "#ED1C24", initials: "AIR" },
+  { id: "glo", name: "Glo", color: "#00A651", initials: "GLO" },
+  { id: "9mobile", name: "9mobile", color: "#00A99D", initials: "9MO" },
+];
+
+const PLANS = [
+  // =========================
+  // MTN
+  // =========================
+  {
+    id: "mtn-500mb",
+    network: "mtn",
+    productCode: "2",
+    productId: "500",
+    name: "500 MB - Weekly (SME)",
+    size: "500MB",
+    price: 307,
+    validity: "7 days",
+    type: "SME",
+  },
+  {
+    id: "mtn-500.00",
+    network: "mtn",
+    productCode: "9",
+    productId: "500.00",
+    name: "500 MB - Monthly (SME)",
+    size: "500MB",
+    price: 307,
+    validity: "30 days",
+    type: "SME",
+  },
+  {
+    id: "mtn-1000",
+    network: "mtn",
+    productCode: "4",
+    productId: "1000",
+    name: "1 GB - Weekly (SME)",
+    size: "1GB",
+    price: 460,
+    validity: "7 days",
+    type: "SME",
+  },
+  {
+    id: "mtn-1000.00",
+    network: "mtn",
+    productCode: "10",
+    productId: "1000.00",
+    name: "1 GB - Monthly (SME)",
+    size: "1GB",
+    price: 650,
+    validity: "30 days",
+    type: "SME",
+  },
+  {
+    id: "mtn-2000",
+    network: "mtn",
+    productCode: "5",
+    productId: "2000",
+    name: "2 GB - Weekly (SME)",
+    size: "2GB",
+    price: 870,
+    validity: "7 days",
+    type: "SME",
+  },
+  {
+    id: "mtn-2000.00",
+    network: "mtn",
+    productCode: "11",
+    productId: "2000.00",
+    name: "2 GB - Monthly (SME)",
+    size: "2GB",
+    price: 1217,
+    validity: "30 days",
+    type: "SME",
+  },
+  {
+    id: "mtn-3000",
+    network: "mtn",
+    productCode: "6",
+    productId: "3000",
+    name: "3 GB - Weekly (SME)",
+    size: "3GB",
+    price: 1330,
+    validity: "7 days",
+    type: "SME",
+  },
+  {
+    id: "mtn-3000.00",
+    network: "mtn",
+    productCode: "12",
+    productId: "3000.00",
+    name: "3 GB - Monthly (SME)",
+    size: "3GB",
+    price: 1729,
+    validity: "30 days",
+    type: "SME",
+  },
+  // {
+  //   id: "mtn-5000",
+  //   network: "mtn",
+  //   productCode: "8",
+  //   productId: "5000",
+  //   name: "5 GB - Weekly (SME)",
+  //   size: "5GB",
+  //   price: 2050,
+  //   validity: "7 days",
+  //   type: "SME",
+  // },
+  {
+    id: "mtn-5000.00",
+    network: "mtn",
+    productCode: "13",
+    productId: "5000.00",
+    name: "5 GB - Monthly (SME)",
+    size: "5GB",
+    price: 2611,
+    validity: "30 days",
+    type: "SME",
+  },
+
+  {
+    id: "mtn-38-10001",
+    network: "mtn",
+    productCode: "38",
+    productId: "100.01",
+    name: "110MB Daily Plan - 1 day (Awoof Data)",
+    size: "110MB",
+    price: 97,
+    validity: "1 day",
+    type: "Awoof Data",
+  },
+  {
+    id: "mtn-39-20001",
+    network: "mtn",
+    productCode: "39",
+    productId: "200.01",
+    name: "230MB Daily Plan - 1 day (Awoof Data)",
+    size: "230MB",
+    price: 194,
+    validity: "1 day",
+    type: "Awoof Data",
+  },
+  {
+    id: "mtn-40-35001",
+    network: "mtn",
+    productCode: "40",
+    productId: "350.01",
+    name: "500MB Daily Plan - 1 day (Awoof Data)",
+    size: "500MB",
+    price: 340,
+    validity: "1 day",
+    type: "Awoof Data",
+  },
+  {
+    id: "mtn-14-50001",
+    network: "mtn",
+    productCode: "14",
+    productId: "500.01",
+    name: "1GB Daily Plan + 1.5mins. - 1 day (Awoof Data)",
+    size: "1GB",
+    price: 485,
+    validity: "1 day",
+    type: "Awoof Data",
+  },
+  {
+    id: "mtn-15-75001",
+    network: "mtn",
+    productCode: "15",
+    productId: "750.01",
+    name: "2.5GB Daily Plan - 1 day (Awoof Data)",
+    size: "2.5GB",
+    price: 728,
+    validity: "1 day",
+    type: "Awoof Data",
+  },
+  {
+    id: "mtn-16-90001",
+    network: "mtn",
+    productCode: "16",
+    productId: "900.01",
+    name: "2.5GB 2-Day Plan - 2 days (Awoof Data)",
+    size: "2.5GB",
+    price: 873,
+    validity: "2 days",
+    type: "Awoof Data",
+  },
+  {
+    id: "mtn-17-100001",
+    network: "mtn",
+    productCode: "17",
+    productId: "1000.01",
+    name: "3.2GB 2-Day Plan - 2 days (Awoof Data)",
+    size: "3.2GB",
+    price: 970,
+    validity: "2 days",
+    type: "Awoof Data",
+  },
+
+  {
+    id: "mtn-500.02",
+    network: "mtn",
+    productCode: "18",
+    productId: "500.02",
+    name: "500MB Weekly Plan - 7 days (Direct Data)",
+    size: "500MB",
+    price: 535,
+    validity: "7 days",
+    type: "Direct Data",
+  },
+  {
+    id: "mtn-800.01",
+    network: "mtn",
+    productCode: "19",
+    productId: "800.01",
+    name: "1GB Weekly Plan - 7 days (Direct Data)",
+    size: "1GB",
+    price: 826,
+    validity: "7 days",
+    type: "Direct Data",
+  },
+  {
+    id: "mtn-1000.03",
+    network: "mtn",
+    productCode: "40",
+    productId: "1000.03",
+    name: "1.5GB Weekly Plan - 7 days (Direct Data)",
+    size: "1.5GB",
+    price: 1020,
+    validity: "7 days",
+    type: "Direct Data",
+  },
+  {
+    id: "mtn-1500.03",
+    network: "mtn",
+    productCode: "41",
+    productId: "1500.03",
+    name: "3.5GB Weekly Plan - 7 days (Direct Data)",
+    size: "3.5GB",
+    price: 1555,
+    validity: "7 days",
+    type: "Direct Data",
+  },
+  {
+    id: "mtn-2500.01",
+    network: "mtn",
+    productCode: "20",
+    productId: "2500.01",
+    name: "6GB Weekly Plan - 7 days (Direct Data)",
+    size: "6GB",
+    price: 2525,
+    validity: "7 days",
+    type: "Direct Data",
+  },
+  {
+    id: "mtn-3500.01",
+    network: "mtn",
+    productCode: "21",
+    productId: "3500.01",
+    name: "11GB Weekly Bundle - 7 days (Direct Data)",
+    size: "11GB",
+    price: 3495,
+    validity: "7 days",
+    type: "Direct Data",
+  },
+  {
+    id: "mtn-1500.02",
+    network: "mtn",
+    productCode: "22",
+    productId: "1500.02",
+    name: "2GB+2mins Monthly Plan - 30 days (Direct Data)",
+    size: "2GB + 2mins",
+    price: 1555,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "mtn-2000.01",
+    network: "mtn",
+    productCode: "23",
+    productId: "2000.01",
+    name: "2.7GB+2mins Monthly Plan - 30 days (Direct Data)",
+    size: "2.7GB + 2mins",
+    price: 1990,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "mtn-2500.02",
+    network: "mtn",
+    productCode: "24",
+    productId: "2500.02",
+    name: "3.5GB+5mins Monthly Plan - 30 days (Direct Data)",
+    size: "3.5GB + 5mins",
+    price: 2525,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "mtn-3500.02",
+    network: "mtn",
+    productCode: "26",
+    productId: "3500.02",
+    name: "7GB Monthly Plan - 30 days (Direct Data)",
+    size: "7GB",
+    price: 3495,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "mtn-4500.01",
+    network: "mtn",
+    productCode: "27",
+    productId: "4500.01",
+    name: "10GB+10mins Monthly Plan - 30 days (Direct Data)",
+    size: "10GB + 10mins",
+    price: 4465,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "mtn-5500.01",
+    network: "mtn",
+    productCode: "28",
+    productId: "5500.01",
+    name: "12.5GB Monthly Plan - 30 days (Direct Data)",
+    size: "12.5GB",
+    price: 5435,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "mtn-29-650001",
+    network: "mtn",
+    productCode: "29",
+    productId: "6500.01",
+    name: "16.5GB+10mins Monthly Plan - 30 days (Direct Data)",
+    size: "16.5GB + 10mins",
+    price: 6305,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "mtn-30-750001",
+    network: "mtn",
+    productCode: "30",
+    productId: "7500.01",
+    name: "20GB Monthly Plan - 30 days (Direct Data)",
+    size: "20GB",
+    price: 7275,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "mtn-31-900001",
+    network: "mtn",
+    productCode: "31",
+    productId: "9000.01",
+    name: "25GB Monthly Plan - 30 days (Direct Data)",
+    size: "25GB",
+    price: 8730,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "mtn-32-1100001",
+    network: "mtn",
+    productCode: "32",
+    productId: "11000.01",
+    name: "36GB Monthly Plan - 30 days (Direct Data)",
+    size: "36GB",
+    price: 10670,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "mtn-33-1800001",
+    network: "mtn",
+    productCode: "33",
+    productId: "18000.01",
+    name: "75GB Monthly Plan - 30 days (Direct Data)",
+    size: "75GB",
+    price: 17460,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "mtn-34-3500001",
+    network: "mtn",
+    productCode: "34",
+    productId: "35000.01",
+    name: "165GB Monthly Plan - 30 days (Direct Data)",
+    size: "165GB",
+    price: 33950,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "mtn-35-4000001",
+    network: "mtn",
+    productCode: "35",
+    productId: "40000.01",
+    name: "150GB 2-Month Plan - 60 days (Direct Data)",
+    size: "150GB",
+    price: 38800,
+    validity: "60 days",
+    type: "Direct Data",
+  },
+  {
+    id: "mtn-36-500001",
+    network: "mtn",
+    productCode: "36",
+    productId: "5000.01",
+    name: "20GB Weekly Plan - 7 days (Direct Data)",
+    size: "20GB",
+    price: 4850,
+    validity: "7 days",
+    type: "Direct Data",
+  },
+  {
+    id: "mtn-37-9000003",
+    network: "mtn",
+    productCode: "37",
+    productId: "90000.03",
+    name: "480GB 3-Month Plan - 90 days (Direct Data)",
+    size: "480GB",
+    price: 87300,
+    validity: "90 days",
+    type: "Direct Data",
+  },
+
+
+  // =========================
+  // GLO
+  // =========================
+  {
+    id: "glo-200",
+    network: "glo",
+    productCode: "1",
+    productId: "200",
+    name: "200 MB - 14 days (SME)",
+    size: "200MB",
+    price: 94,
+    validity: "14 days",
+    type: "SME",
+  },
+  {
+    id: "glo-2-500",
+    network: "glo",
+    productCode: "2",
+    productId: "500",
+    name: "500 MB - 7 days (SME)",
+    size: "500MB",
+    price: 230,
+    validity: "7 days",
+    type: "SME",
+  },
+  {
+    id: "glo-8-100011",
+    network: "glo",
+    productCode: "8",
+    productId: "1000.11",
+    name: "1 GB - 3 days (SME)",
+    size: "1GB",
+    price: 392,
+    validity: "3 days",
+    type: "SME",
+  },
+  {
+    id: "glo-9-300011",
+    network: "glo",
+    productCode: "9",
+    productId: "3000.11",
+    name: "3 GB - 3 days (SME)",
+    size: "3GB",
+    price: 1176,
+    validity: "3 days",
+    type: "SME",
+  },
+  {
+    id: "glo-10-500011",
+    network: "glo",
+    productCode: "10",
+    productId: "5000.11",
+    name: "5 GB - 3 days (SME)",
+    size: "5GB",
+    price: 1960,
+    validity: "3 days",
+    type: "SME",
+  },
+  {
+    id: "glo-11-100012",
+    network: "glo",
+    productCode: "11",
+    productId: "1000.12",
+    name: "1 GB - 7 days (SME)",
+    size: "1GB",
+    price: 409,
+    validity: "7 days",
+    type: "SME",
+  },
+  {
+    id: "glo-12-300012",
+    network: "glo",
+    productCode: "12",
+    productId: "3000.12",
+    name: "3 GB - 7 days (SME)",
+    size: "3GB",
+    price: 1228,
+    validity: "7 days",
+    type: "SME",
+  },
+  {
+    id: "glo-13-500012",
+    network: "glo",
+    productCode: "13",
+    productId: "5000.12",
+    name: "5 GB - 7 days (SME)",
+    size: "5GB",
+    price: 2046,
+    validity: "7 days",
+    type: "SME",
+  },
+  {
+    id: "glo-37-100021",
+    network: "glo",
+    productCode: "37",
+    productId: "1000.21",
+    name: "1 GB - 14 days Night Plan (SME)",
+    size: "1GB",
+    price: 409,
+    validity: "14 days",
+    type: "SME",
+  },
+  {
+    id: "glo-38-300021",
+    network: "glo",
+    productCode: "38",
+    productId: "3000.21",
+    name: "3 GB - 14 days Night Plan (SME)",
+    size: "3GB",
+    price: 1228,
+    validity: "14 days",
+    type: "SME",
+  },
+  {
+    id: "glo-39-500021",
+    network: "glo",
+    productCode: "39",
+    productId: "5000.21",
+    name: "5 GB - 14 days Night Plan (SME)",
+    size: "5GB",
+    price: 2046,
+    validity: "14 days",
+    type: "SME",
+  },
+  {
+    id: "glo-40-1000021",
+    network: "glo",
+    productCode: "40",
+    productId: "10000.21",
+    name: "10 GB - 14 days Night Plan (SME)",
+    size: "10GB",
+    price: 4093,
+    validity: "14 days",
+    type: "SME",
+  },
+  {
+    id: "glo-3-1000",
+    network: "glo",
+    productCode: "3",
+    productId: "1000",
+    name: "1 GB - 30 days (SME)",
+    size: "1GB",
+    price: 461,
+    validity: "30 days",
+    type: "SME",
+  },
+  {
+    id: "glo-4-2000",
+    network: "glo",
+    productCode: "4",
+    productId: "2000",
+    name: "2 GB - 30 days (SME)",
+    size: "2GB",
+    price: 922,
+    validity: "30 days",
+    type: "SME",
+  },
+  {
+    id: "glo-5-3000",
+    network: "glo",
+    productCode: "5",
+    productId: "3000",
+    name: "3 GB - 30 days (SME)",
+    size: "3GB",
+    price: 1383,
+    validity: "30 days",
+    type: "SME",
+  },
+  {
+    id: "glo-6-5000",
+    network: "glo",
+    productCode: "6",
+    productId: "5000",
+    name: "5 GB - 30 days (SME)",
+    size: "5GB",
+    price: 2306,
+    validity: "30 days",
+    type: "SME",
+  },
+  {
+    id: "glo-7-10000",
+    network: "glo",
+    productCode: "7",
+    productId: "10000",
+    name: "10 GB - 30 days (SME)",
+    size: "10GB",
+    price: 4612,
+    validity: "30 days",
+    type: "SME",
+  },
+  {
+    id: "glo-14-10001",
+    network: "glo",
+    productCode: "14",
+    productId: "100.01",
+    name: "125MB - 1 day (Awoof Data)",
+    size: "125MB",
+    price: 97,
+    validity: "1 day",
+    type: "Awoof Data",
+  },
+  {
+    id: "glo-15-20001",
+    network: "glo",
+    productCode: "15",
+    productId: "200.01",
+    name: "260MB - 2 day (Awoof Data)",
+    size: "260MB",
+    price: 194,
+    validity: "2 days",
+    type: "Awoof Data",
+  },
+  {
+    id: "glo-16-50001",
+    network: "glo",
+    productCode: "16",
+    productId: "500.01",
+    name: "1.5GB - 14 days (Direct Data)",
+    size: "1.5GB",
+    price: 485,
+    validity: "14 days",
+    type: "Direct Data",
+  },
+  {
+    id: "glo-17-100001",
+    network: "glo",
+    productCode: "17",
+    productId: "1000.01",
+    name: "2.6GB - 30 days (Direct Data)",
+    size: "2.6GB",
+    price: 970,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "glo-18-150001",
+    network: "glo",
+    productCode: "18",
+    productId: "1500.01",
+    name: "5GB - 30 days (Direct Data)",
+    size: "5GB",
+    price: 1455,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "glo-19-200001",
+    network: "glo",
+    productCode: "19",
+    productId: "2000.01",
+    name: "6.15GB - 30 days (Direct Data)",
+    size: "6.15GB",
+    price: 1940,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "glo-20-250001",
+    network: "glo",
+    productCode: "20",
+    productId: "2500.01",
+    name: "7.5GB - 30 days (Direct Data)",
+    size: "7.5GB",
+    price: 2425,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "glo-21-300001",
+    network: "glo",
+    productCode: "21",
+    productId: "3000.01",
+    name: "10GB - 30 days (Direct Data)",
+    size: "10GB",
+    price: 2910,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "glo-22-400001",
+    network: "glo",
+    productCode: "22",
+    productId: "4000.01",
+    name: "12.5GB - 30 days (Direct Data)",
+    size: "12.5GB",
+    price: 3880,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "glo-23-500001",
+    network: "glo",
+    productCode: "23",
+    productId: "5000.01",
+    name: "16GB - 30 days (Direct Data)",
+    size: "16GB",
+    price: 4850,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "glo-24-800001",
+    network: "glo",
+    productCode: "24",
+    productId: "8000.01",
+    name: "28GB - 30 days (Direct Data)",
+    size: "28GB",
+    price: 7760,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "glo-25-1000001",
+    network: "glo",
+    productCode: "25",
+    productId: "10000.01",
+    name: "38GB - 30 days (Direct Data)",
+    size: "38GB",
+    price: 9700,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "glo-26-1500001",
+    network: "glo",
+    productCode: "26",
+    productId: "15000.01",
+    name: "64GB - 30 days (Direct Data)",
+    size: "64GB",
+    price: 14550,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "glo-27-2000001",
+    network: "glo",
+    productCode: "27",
+    productId: "20000.01",
+    name: "107GB - 30 days (Direct Data)",
+    size: "107GB",
+    price: 19400,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "glo-28-50002",
+    network: "glo",
+    productCode: "28",
+    productId: "500.02",
+    name: "2GB - 1 day (Awoof Data)",
+    size: "2GB",
+    price: 485,
+    validity: "1 day",
+    type: "Awoof Data",
+  },
+  {
+    id: "glo-29-150002",
+    network: "glo",
+    productCode: "29",
+    productId: "1500.02",
+    name: "6GB - 7 days (Direct Data)",
+    size: "6GB",
+    price: 1455,
+    validity: "7 days",
+    type: "Direct Data",
+  },
+  {
+    id: "glo-30-50003",
+    network: "glo",
+    productCode: "30",
+    productId: "500.03",
+    name: "2.5GB - Weekend Plan - [Sat & Sun] (Awoof Data)",
+    size: "2.5GB",
+    price: 485,
+    validity: "Weekend",
+    type: "Awoof Data",
+  },
+  {
+    id: "glo-31-20002",
+    network: "glo",
+    productCode: "31",
+    productId: "200.02",
+    name: "875MB - Weekend Plan [Sun] (Awoof Data)",
+    size: "875MB",
+    price: 194,
+    validity: "Sunday",
+    type: "Awoof Data",
+  },
+  {
+    id: "glo-32-3000001",
+    network: "glo",
+    productCode: "32",
+    productId: "30000.01",
+    name: "165GB - 30 days (Direct Data)",
+    size: "165GB",
+    price: 29100,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "glo-33-3600001",
+    network: "glo",
+    productCode: "33",
+    productId: "36000.01",
+    name: "220GB - 30 days (Direct Data)",
+    size: "220GB",
+    price: 38800,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "glo-34-5000001",
+    network: "glo",
+    productCode: "34",
+    productId: "50000.01",
+    name: "320GB - 30 days (Direct Data)",
+    size: "320GB",
+    price: 48500,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "glo-35-6000001",
+    network: "glo",
+    productCode: "35",
+    productId: "60000.01",
+    name: "380GB - 30 days (Direct Data)",
+    size: "380GB",
+    price: 58200,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "glo-36-7500001",
+    network: "glo",
+    productCode: "36",
+    productId: "75000.01",
+    name: "475GB - 30 days (Direct Data)",
+    size: "475GB",
+    price: 72750,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "glo-41-15000003",
+    network: "glo",
+    productCode: "41",
+    productId: "150000.03",
+    name: "1TB (1000GB) - 365 days (Direct Data)",
+    size: "1TB",
+    price: 150000,
+    validity: "365 days",
+    type: "Direct Data",
+  },
+
+
+  // =========================
+  // 9MOBILE
+  // =========================
+  {
+    id: "9mobile-1-50",
+    network: "9mobile",
+    productCode: "1",
+    productId: "50",
+    name: "50 MB - 30 days (SME)",
+    size: "50MB",
+    price: 25,
+    validity: "30 days",
+    type: "SME",
+  },
+  {
+    id: "9mobile-2-100",
+    network: "9mobile",
+    productCode: "2",
+    productId: "100",
+    name: "100 MB - 30 days (SME)",
+    size: "100MB",
+    price: 51,
+    validity: "30 days",
+    type: "SME",
+  },
+  {
+    id: "9mobile-3-300",
+    network: "9mobile",
+    productCode: "3",
+    productId: "300",
+    name: "300 MB - 30 days (SME)",
+    size: "300MB",
+    price: 153,
+    validity: "30 days",
+    type: "SME",
+  },
+  {
+    id: "9mobile-4-500",
+    network: "9mobile",
+    productCode: "4",
+    productId: "500",
+    name: "500 MB - 30 days (SME)",
+    size: "500MB",
+    price: 246,
+    validity: "30 days",
+    type: "SME",
+  },
+  {
+    id: "9mobile-5-1000",
+    network: "9mobile",
+    productCode: "5",
+    productId: "1000",
+    name: "1 GB - 30 days (SME)",
+    size: "1GB",
+    price: 492,
+    validity: "30 days",
+    type: "SME",
+  },
+  {
+    id: "9mobile-6-2000",
+    network: "9mobile",
+    productCode: "6",
+    productId: "2000",
+    name: "2 GB - 30 days (SME)",
+    size: "2GB",
+    price: 984,
+    validity: "30 days",
+    type: "SME",
+  },
+  {
+    id: "9mobile-7-3000",
+    network: "9mobile",
+    productCode: "7",
+    productId: "3000",
+    name: "3 GB - 30 days (SME)",
+    size: "3GB",
+    price: 1476,
+    validity: "30 days",
+    type: "SME",
+  },
+  {
+    id: "9mobile-8-4000",
+    network: "9mobile",
+    productCode: "8",
+    productId: "4000",
+    name: "4 GB - 30 days (SME)",
+    size: "4GB",
+    price: 1968,
+    validity: "30 days",
+    type: "SME",
+  },
+  {
+    id: "9mobile-9-5000",
+    network: "9mobile",
+    productCode: "9",
+    productId: "5000",
+    name: "5 GB - 30 days (SME)",
+    size: "5GB",
+    price: 2460,
+    validity: "30 days",
+    type: "SME",
+  },
+  {
+    id: "9mobile-10-10000",
+    network: "9mobile",
+    productCode: "10",
+    productId: "10000",
+    name: "10 GB - 30 days (SME)",
+    size: "10GB",
+    price: 4920,
+    validity: "30 days",
+    type: "SME",
+  },
+  {
+    id: "9mobile-11-15000",
+    network: "9mobile",
+    productCode: "11",
+    productId: "15000",
+    name: "15 GB - 30 days (SME)",
+    size: "15GB",
+    price: 7380,
+    validity: "30 days",
+    type: "SME",
+  },
+  {
+    id: "9mobile-12-20000",
+    network: "9mobile",
+    productCode: "12",
+    productId: "20000",
+    name: "20 GB - 30 days (SME)",
+    size: "20GB",
+    price: 9840,
+    validity: "30 days",
+    type: "SME",
+  },
+  {
+    id: "9mobile-13-25000",
+    network: "9mobile",
+    productCode: "13",
+    productId: "25000",
+    name: "25 GB - 30 days (SME)",
+    size: "25GB",
+    price: 12300,
+    validity: "30 days",
+    type: "SME",
+  },
+
+  {
+    id: "9mobile-14-10001",
+    network: "9mobile",
+    productCode: "14",
+    productId: "100.01",
+    name: "100MB - 1 day (Awoof Data)",
+    size: "100MB",
+    price: 93,
+    validity: "1 day",
+    type: "Awoof Data",
+  },
+  {
+    id: "9mobile-15-15001",
+    network: "9mobile",
+    productCode: "15",
+    productId: "150.01",
+    name: "180MB - 1 day (Awoof Data)",
+    size: "180MB",
+    price: 140,
+    validity: "1 day",
+    type: "Awoof Data",
+  },
+  {
+    id: "9mobile-16-20001",
+    network: "9mobile",
+    productCode: "16",
+    productId: "200.01",
+    name: "250MB - 1 day (Awoof Data)",
+    size: "250MB",
+    price: 186,
+    validity: "1 day",
+    type: "Awoof Data",
+  },
+  {
+    id: "9mobile-17-35001",
+    network: "9mobile",
+    productCode: "17",
+    productId: "350.01",
+    name: "450MB - 1 day (Awoof Data)",
+    size: "450MB",
+    price: 326,
+    validity: "1 day",
+    type: "Awoof Data",
+  },
+  {
+    id: "9mobile-18-50001",
+    network: "9mobile",
+    productCode: "18",
+    productId: "500.01",
+    name: "650MB - 3 days (Awoof Data)",
+    size: "650MB",
+    price: 465,
+    validity: "3 days",
+    type: "Awoof Data",
+  },
+  {
+    id: "9mobile-19-150001",
+    network: "9mobile",
+    productCode: "19",
+    productId: "1500.01",
+    name: "1.75GB - 7 days (Direct Data)",
+    size: "1.75GB",
+    price: 1395,
+    validity: "7 days",
+    type: "Direct Data",
+  },
+  {
+    id: "9mobile-20-60001",
+    network: "9mobile",
+    productCode: "20",
+    productId: "600.01",
+    name: "650MB - 14 days (Direct Data)",
+    size: "650MB",
+    price: 558,
+    validity: "14 days",
+    type: "Direct Data",
+  },
+  {
+    id: "9mobile-21-100001",
+    network: "9mobile",
+    productCode: "21",
+    productId: "1000.01",
+    name: "1.1GB - 30 days (Direct Data)",
+    size: "1.1GB",
+    price: 930,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "9mobile-22-120001",
+    network: "9mobile",
+    productCode: "22",
+    productId: "1200.01",
+    name: "1.4GB - 30 days (Direct Data)",
+    size: "1.4GB",
+    price: 1116,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "9mobile-23-200001",
+    network: "9mobile",
+    productCode: "23",
+    productId: "2000.01",
+    name: "2.44GB - 30 days (Direct Data)",
+    size: "2.44GB",
+    price: 1860,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "9mobile-24-250001",
+    network: "9mobile",
+    productCode: "24",
+    productId: "2500.01",
+    name: "3.17GB - 30 days (Direct Data)",
+    size: "3.17GB",
+    price: 2325,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "9mobile-25-300001",
+    network: "9mobile",
+    productCode: "25",
+    productId: "3000.01",
+    name: "3.91GB - 30 days (Direct Data)",
+    size: "3.91GB",
+    price: 2790,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "9mobile-26-400001",
+    network: "9mobile",
+    productCode: "26",
+    productId: "4000.01",
+    name: "5.10GB - 30 days (Direct Data)",
+    size: "5.10GB",
+    price: 3720,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "9mobile-27-500001",
+    network: "9mobile",
+    productCode: "27",
+    productId: "5000.01",
+    name: "6.5GB - 30 days (Direct Data)",
+    size: "6.5GB",
+    price: 4650,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "9mobile-28-1200001",
+    network: "9mobile",
+    productCode: "28",
+    productId: "12000.01",
+    name: "16GB - 30 days (Direct Data)",
+    size: "16GB",
+    price: 11160,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "9mobile-29-1850001",
+    network: "9mobile",
+    productCode: "29",
+    productId: "18500.01",
+    name: "24.3GB - 30 days (Direct Data)",
+    size: "24.3GB",
+    price: 17205,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "9mobile-30-2000001",
+    network: "9mobile",
+    productCode: "30",
+    productId: "20000.01",
+    name: "26.5GB - 30 days (Direct Data)",
+    size: "26.5GB",
+    price: 18600,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "9mobile-31-3000001",
+    network: "9mobile",
+    productCode: "31",
+    productId: "30000.01",
+    name: "39GB - 60 days (Direct Data)",
+    size: "39GB",
+    price: 27900,
+    validity: "60 days",
+    type: "Direct Data",
+  },
+
+
+  // =========================
+  // AIRTEL
+  // =========================
+  {
+    id: "airtel-14-49991",
+    network: "airtel",
+    productCode: "14",
+    productId: "499.91",
+    name: "1GB - 1 day (Awoof Data)",
+    size: "1GB",
+    price: 485,
+    validity: "1 day",
+    type: "Awoof Data",
+  },
+  {
+    id: "airtel-15-59991",
+    network: "airtel",
+    productCode: "15",
+    productId: "599.91",
+    name: "1.5GB - 2 days (Awoof Data)",
+    size: "1.5GB",
+    price: 582,
+    validity: "2 days",
+    type: "Awoof Data",
+  },
+  {
+    id: "airtel-16-74991",
+    network: "airtel",
+    productCode: "16",
+    productId: "749.91",
+    name: "2GB - 2 days (Awoof Data)",
+    size: "2GB",
+    price: 727,
+    validity: "2 days",
+    type: "Awoof Data",
+  },
+  {
+    id: "airtel-17-99991",
+    network: "airtel",
+    productCode: "17",
+    productId: "999.91",
+    name: "3GB - 2 days (Awoof Data)",
+    size: "3GB",
+    price: 970,
+    validity: "2 days",
+    type: "Awoof Data",
+  },
+  {
+    id: "airtel-18-149991",
+    network: "airtel",
+    productCode: "18",
+    productId: "1499.91",
+    name: "5GB - 2 days (Awoof Data)",
+    size: "5GB",
+    price: 1455,
+    validity: "2 days",
+    type: "Awoof Data",
+  },
+  {
+    id: "airtel-19-49992",
+    network: "airtel",
+    productCode: "19",
+    productId: "499.92",
+    name: "500MB - 7 days (Direct Data)",
+    size: "500MB",
+    price: 485,
+    validity: "7 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-20-79991",
+    network: "airtel",
+    productCode: "20",
+    productId: "799.91",
+    name: "1GB - 7 days (Direct Data)",
+    size: "1GB",
+    price: 776,
+    validity: "7 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-21-99992",
+    network: "airtel",
+    productCode: "21",
+    productId: "999.92",
+    name: "1.5GB - 7 days (Direct Data)",
+    size: "1.5GB",
+    price: 970,
+    validity: "7 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-22-149992",
+    network: "airtel",
+    productCode: "22",
+    productId: "1499.92",
+    name: "3.5GB - 7 days (Direct Data)",
+    size: "3.5GB",
+    price: 1455,
+    validity: "7 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-23-249991",
+    network: "airtel",
+    productCode: "23",
+    productId: "2499.91",
+    name: "6GB - 7 days (Direct Data)",
+    size: "6GB",
+    price: 2425,
+    validity: "7 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-24-299991",
+    network: "airtel",
+    productCode: "24",
+    productId: "2999.91",
+    name: "10GB - 7 days (Direct Data)",
+    size: "10GB",
+    price: 2910,
+    validity: "7 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-25-499991",
+    network: "airtel",
+    productCode: "25",
+    productId: "4999.91",
+    name: "18GB - 7 days (Direct Data)",
+    size: "18GB",
+    price: 4850,
+    validity: "7 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-26-149993",
+    network: "airtel",
+    productCode: "26",
+    productId: "1499.93",
+    name: "2GB - 30 days (Direct Data)",
+    size: "2GB",
+    price: 1455,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-27-199991",
+    network: "airtel",
+    productCode: "27",
+    productId: "1999.91",
+    name: "3GB - 30 days (Direct Data)",
+    size: "3GB",
+    price: 1940,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-28-249992",
+    network: "airtel",
+    productCode: "28",
+    productId: "2499.92",
+    name: "4GB - 30 days (Direct Data)",
+    size: "4GB",
+    price: 2425,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-29-299992",
+    network: "airtel",
+    productCode: "29",
+    productId: "2999.92",
+    name: "8GB - 30 days (Direct Data)",
+    size: "8GB",
+    price: 2910,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-30-399991",
+    network: "airtel",
+    productCode: "30",
+    productId: "3999.91",
+    name: "10GB - 30 days (Direct Data)",
+    size: "10GB",
+    price: 3880,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-31-499992",
+    network: "airtel",
+    productCode: "31",
+    productId: "4999.92",
+    name: "13GB - 30 days (Direct Data)",
+    size: "13GB",
+    price: 4850,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-32-599991",
+    network: "airtel",
+    productCode: "32",
+    productId: "5999.91",
+    name: "18GB - 30 days (Direct Data)",
+    size: "18GB",
+    price: 5820,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-33-799991",
+    network: "airtel",
+    productCode: "33",
+    productId: "7999.91",
+    name: "25GB - 30 days (Direct Data)",
+    size: "25GB",
+    price: 7760,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-34-999991",
+    network: "airtel",
+    productCode: "34",
+    productId: "9999.91",
+    name: "35GB - 30 days (Direct Data)",
+    size: "35GB",
+    price: 9700,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-35-1499991",
+    network: "airtel",
+    productCode: "35",
+    productId: "14999.91",
+    name: "60GB - 30 days (Direct Data)",
+    size: "60GB",
+    price: 14550,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-36-1999991",
+    network: "airtel",
+    productCode: "36",
+    productId: "19999.91",
+    name: "100GB - 30 days (Direct Data)",
+    size: "100GB",
+    price: 19400,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-37-2999991",
+    network: "airtel",
+    productCode: "37",
+    productId: "29999.91",
+    name: "160GB - 30 days (Direct Data)",
+    size: "160GB",
+    price: 29100,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-38-3999991",
+    network: "airtel",
+    productCode: "38",
+    productId: "39999.91",
+    name: "210GB - 30 days (Direct Data)",
+    size: "210GB",
+    price: 38800,
+    validity: "30 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-39-4999991",
+    network: "airtel",
+    productCode: "39",
+    productId: "49999.91",
+    name: "300GB - 90 days (Direct Data)",
+    size: "300GB",
+    price: 48500,
+    validity: "90 days",
+    type: "Direct Data",
+  },
+  {
+    id: "airtel-40-5999991",
+    network: "airtel",
+    productCode: "40",
+    productId: "59999.91",
+    name: "350GB - 90 days (Direct Data)",
+    size: "350GB",
+    price: 58200,
+    validity: "90 days",
+    type: "Direct Data",
+  },
+];
+
+const INITIAL_TRANSACTIONS = [
+  { id: "TXN-88213", network: "mtn", size: "2GB", phone: "0803•••2210", amount: 1100, status: "success", date: "Today, 10:24 AM" },
+  { id: "TXN-88190", network: "glo", size: "5.8GB", phone: "0805•••7743", amount: 1500, status: "success", date: "Today, 8:02 AM" },
+  { id: "TXN-88144", network: "airtel", size: "1GB", phone: "0701•••9021", amount: 500, status: "failed", date: "Yesterday, 6:41 PM" },
+  { id: "TXN-88109", network: "9mobile", size: "4.5GB", phone: "0809•••1187", amount: 1800, status: "success", date: "Yesterday, 1:15 PM" },
+];
+
+/* -------------------------------------------------------------------------- */
+/* Small inline icon set — keeps the component dependency-free                */
+/* -------------------------------------------------------------------------- */
+
+const Icon = {
+  Search: (props) => (
+    <svg viewBox="0 0 24 24" fill="none" {...props}>
+      <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+      <path d="M21 21l-4.3-4.3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  ),
+  Wifi: (props) => (
+    <svg viewBox="0 0 24 24" fill="none" {...props}>
+      <path d="M2 8.5a16 16 0 0 1 20 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M5.5 12.5a11 11 0 0 1 13 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M9 16.3a6 6 0 0 1 6 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="12" cy="19.5" r="1.4" fill="currentColor" />
+    </svg>
+  ),
+  Clock: (props) => (
+    <svg viewBox="0 0 24 24" fill="none" {...props}>
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+      <path d="M12 7.5V12l3 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  Shield: (props) => (
+    <svg viewBox="0 0 24 24" fill="none" {...props}>
+      <path d="M12 3l7 3v5.2c0 4.6-3 8.4-7 9.8-4-1.4-7-5.2-7-9.8V6l7-3z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M9 12.3l2 2 4-4.3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  Bolt: (props) => (
+    <svg viewBox="0 0 24 24" fill="none" {...props}>
+      <path d="M13 3L5 13.5h5.2L10 21l8-11h-5.2L13 3z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+    </svg>
+  ),
+  Headset: (props) => (
+    <svg viewBox="0 0 24 24" fill="none" {...props}>
+      <path d="M4 13a8 8 0 0 1 16 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <rect x="3" y="13" width="4" height="6" rx="1.5" stroke="currentColor" strokeWidth="2" />
+      <rect x="17" y="13" width="4" height="6" rx="1.5" stroke="currentColor" strokeWidth="2" />
+      <path d="M19 19.5a4 4 0 0 1-4 3.5h-2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  ),
+  Check: (props) => (
+    <svg viewBox="0 0 24 24" fill="none" {...props}>
+      <path d="M5 12.5l4.5 4.5L19 7" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
+  Close: (props) => (
+    <svg viewBox="0 0 24 24" fill="none" {...props}>
+      <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  ),
+  Alert: (props) => (
+    <svg viewBox="0 0 24 24" fill="none" {...props}>
+      <path d="M12 9v4.5M12 16.5h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  ),
+  Inbox: (props) => (
+    <svg viewBox="0 0 24 24" fill="none" {...props}>
+      <path d="M4 12l2.5-7h11L20 12" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6h-4.5a2.5 2.5 0 0 1-5 0H4z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+    </svg>
+  ),
+  Spinner: (props) => (
+    <svg viewBox="0 0 24 24" fill="none" className="data-spin" {...props}>
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.2" strokeWidth="3" />
+      <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+    </svg>
+  ),
+};
+
+const SORT_OPTIONS = [
+  { id: "recommended", label: "Recommended" },
+  { id: "price-asc", label: "Price: Low to High" },
+  { id: "price-desc", label: "Price: High to Low" },
+  { id: "size", label: "Data Size" },
+];
+
+/* Parses "2GB" / "500MB" / "5.8GB" into megabytes for sorting */
+function sizeToMb(size) {
+  const value = parseFloat(size);
+  return size.toUpperCase().includes("GB") ? value * 1000 : value;
+}
+
+export default function Data() {
+  const [selectedNetwork, setSelectedNetwork] = useState("mtn");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("recommended");
+  const [phoneNumber, setPhoneNumber] = useState("");
+
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [purchaseStatus, setPurchaseStatus] = useState("idle");
+// idle | loading | pending | success | error
+  const [transactions, setTransactions] = useState(INITIAL_TRANSACTIONS);
+
+  const activeNetwork = NETWORKS.find((n) => n.id === selectedNetwork);
+
+  const filteredPlans = useMemo(() => {
+    let list = PLANS.filter((plan) => plan.network === selectedNetwork);
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      list = list.filter((plan) => plan.size.toLowerCase().includes(q) || String(plan.price).includes(q));
+    }
+
+    switch (sortBy) {
+      case "price-asc":
+        list = [...list].sort((a, b) => a.price - b.price);
+        break;
+      case "price-desc":
+        list = [...list].sort((a, b) => b.price - a.price);
+        break;
+      case "size":
+        list = [...list].sort((a, b) => sizeToMb(a.size) - sizeToMb(b.size));
+        break;
+      default:
+        list = [...list].sort((a, b) => (b.popular ? 1 : 0) - (a.popular ? 1 : 0));
+    }
+
+    return list;
+  }, [selectedNetwork, searchQuery, sortBy]);
+
+  const openBuyModal = (plan) => {
+    setSelectedPlan(plan);
+    setPurchaseStatus("idle");
+  };
+
+  const closeModal = () => {
+    setSelectedPlan(null);
+    setPurchaseStatus("idle");
+  };
+ const confirmPurchase = async () => {
+  if (!selectedPlan) {
+    return;
+  }
+
+  if (!phoneNumber || phoneNumber.trim().length !== 11) {
+    setPurchaseStatus("error");
+    return;
+  }
+
+  setPurchaseStatus("loading");
+try {
+  const token = localStorage.getItem("authToken");
+  const user = JSON.parse(localStorage.getItem("user"));
+  console.log("########")
+  console.log(selectedPlan.id);
+  console.log(user)
+  const userId = user.id;
+  console.log("*************")
+  console.log(userId)
+
+  const response = await fetch(
+    "http://beamaxtechpractical.online/API/buy_data.php",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+
+      
+
+      body: JSON.stringify({
+        network: selectedPlan.network,
+        planId: selectedPlan.id,
+        phone: phoneNumber,
+        user_id:userId,
+      }),
+    }
+  );
+  console.log(response)
+  console.log("hello")
+
+  console.log("HTTP STATUS:", response.status);
+console.log("HTTP OK:", response.ok);
+console.log("RESPONSE HEADERS:", [...response.headers.entries()]);
+
+
+  // Read the response as text FIRST
+  const rawResponse = await response.text();
+
+  console.log("BUY DATA HTTP STATUS:", response.status);
+  console.log("BUY DATA RAW RESPONSE:", rawResponse);
+
+  
+console.log("========== BUY DATA RESPONSE ==========");
+console.log("RAW RESPONSE:", rawResponse);
+console.log("RAW RESPONSE LENGTH:", rawResponse.length);
+console.log("========================================");
+
+if (!rawResponse.trim()) {
+  console.error("❌ buy_data.php returned an EMPTY response.");
+  throw new Error("buy_data.php returned an empty response.");
+}
+
+
+
+  // Prevent "Unexpected end of JSON input"
+  if (!rawResponse.trim()) {
+    console.error("buy_data.php returned an empty response.");
+
+    setPurchaseStatus("error");
+    return;
+  }
+
+  let result;
+
+  try {
+    result = JSON.parse(rawResponse);
+  } catch (jsonError) {
+    console.error("BUY DATA INVALID JSON:", jsonError);
+    console.error("RAW RESPONSE:", rawResponse);
+
+    setPurchaseStatus("error");
+    return;
+  }
+
+  console.log("BUY DATA RESPONSE:", result);
+
+  const purchase = result.data || {};
+
+  /*
+  |--------------------------------------------------------------------------
+  | Pending
+  |--------------------------------------------------------------------------
+  */
+
+  if (
+    purchase.pending === true ||
+    purchase.status === "Pending"
+  ) {
+    setPurchaseStatus("pending");
+
+    setTransactions((prev) => [
+      {
+        id: purchase.reference || `TXN-${Date.now()}`,
+        network: selectedPlan.network,
+        size: selectedPlan.size,
+        phone: `${phoneNumber.slice(0, 4)}•••${phoneNumber.slice(-4)}`,
+        amount: Number(
+          purchase.amount ?? selectedPlan.price
+        ),
+        status: "pending",
+        date: "Just now",
+      },
+      ...prev,
+    ]);
+
+    return;
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Failed
+  |--------------------------------------------------------------------------
+  */
+
+  if (!response.ok || result.success !== true) {
+    console.error(
+      "DATA PURCHASE FAILED:",
+      result.message || "Unknown error"
+    );
+
+    setPurchaseStatus("error");
+    return;
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Success
+  |--------------------------------------------------------------------------
+  */
+
+  setPurchaseStatus("success");
+
+  setTransactions((prev) => [
+    {
+      id: purchase.reference || `TXN-${Date.now()}`,
+      network: selectedPlan.network,
+      size: selectedPlan.size,
+      phone: `${phoneNumber.slice(0, 4)}•••${phoneNumber.slice(-4)}`,
+      amount: Number(
+        purchase.amount ?? selectedPlan.price
+      ),
+      status: "success",
+      date: "Just now",
+    },
+    ...prev,
+  ]);
+
+} catch (error) {
+  console.error("Data purchase error:", error);
+  setPurchaseStatus("error");
+}
+};
+  return (
+    <div className="data-page">
+      {/* ---------------------------------------------------------------- */}
+      {/* Header                                                           */}
+      {/* ---------------------------------------------------------------- */}
+      <div className="data-page__intro">
+        <div>
+          <h1 className="data-page__title">Buy Data</h1>
+          <p className="data-page__subtitle">
+            Get instant data bundles on any network — fast, secure, and always at the best price.
+          </p>
+        </div>
+        <div className="data-page__trust-pill">
+          <Icon.Shield className="data-page__trust-icon" />
+          <span>Bank-grade secure checkout</span>
+        </div>
+      </div>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Network selector                                                 */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="data-card data-card--networks">
+        <h2 className="data-card__label">Select network</h2>
+        <div className="network-grid">
+          {NETWORKS.map((network) => (
+            <button
+              key={network.id}
+              type="button"
+              className={`network-chip ${selectedNetwork === network.id ? "network-chip--active" : ""}`}
+              onClick={() => setSelectedNetwork(network.id)}
+              aria-pressed={selectedNetwork === network.id}
+            >
+              <span className="network-chip__badge" style={{ backgroundColor: network.color }}>
+                {network.initials}
+              </span>
+              <span className="network-chip__name">{network.name}</span>
+              {selectedNetwork === network.id && (
+                <span className="network-chip__check">
+                  <Icon.Check width={12} height={12} />
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        <div className="phone-field">
+          <label htmlFor="phoneNumber" className="phone-field__label">
+            Phone number
+          </label>
+          <input
+            id="phoneNumber"
+            type="tel"
+            inputMode="numeric"
+            maxLength={11}
+            placeholder="e.g. 08031234567"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value.replace(/[^0-9]/g, ""))}
+            className="phone-field__input"
+          />
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Search + filter                                                  */}
+      {/* ---------------------------------------------------------------- */}
+      <div className="data-toolbar">
+        <div className="data-toolbar__search">
+          <Icon.Search width={18} height={18} className="data-toolbar__search-icon" />
+          <input
+            type="text"
+            placeholder="Search a plan (e.g. 1GB, 2000)"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        <div className="data-toolbar__sort">
+          <label htmlFor="sortBy" className="sr-only">
+            Sort plans
+          </label>
+          <select id="sortBy" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+            {SORT_OPTIONS.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Plan cards                                                       */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="data-card">
+        <div className="data-card__header">
+          <h2 className="data-card__label">
+            {activeNetwork.name} data plans
+            <span className="data-card__count">{filteredPlans.length} available</span>
+          </h2>
+        </div>
+
+        {filteredPlans.length > 0 ? (
+          <div className="plan-grid">
+            {filteredPlans.map((plan) => (
+              <article key={plan.id} className={`plan-card ${plan.popular ? "plan-card--popular" : ""}`}>
+                {plan.popular && <span className="plan-card__ribbon">Most popular</span>}
+
+                <div className="plan-card__top">
+                  <span className="plan-card__icon">
+                    <Icon.Wifi width={20} height={20} />
+                  </span>
+                  <span className="plan-card__type">{plan.type}</span>
+                </div>
+
+                <p className="plan-card__size">{plan.size}</p>
+
+                <div className="plan-card__meta">
+                  <span>
+                    <Icon.Clock width={14} height={14} /> {plan.validity}
+                  </span>
+                </div>
+
+                <div className="plan-card__footer">
+                  <p className="plan-card__price">₦{plan.price.toLocaleString()}</p>
+                  <button type="button" className="plan-card__buy" onClick={() => openBuyModal(plan)}>
+                    Buy data
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <Icon.Inbox width={40} height={40} className="empty-state__icon" />
+            <p className="empty-state__title">No plans match your search</p>
+            <p className="empty-state__text">Try a different keyword or clear the search field.</p>
+            <button type="button" className="empty-state__action" onClick={() => setSearchQuery("")}>
+              Clear search
+            </button>
+          </div>
+        )}
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Trust strip                                                      */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="trust-strip">
+        <div className="trust-strip__item">
+          <Icon.Bolt width={18} height={18} />
+          <span>Instant delivery</span>
+        </div>
+        <div className="trust-strip__item">
+          <Icon.Shield width={18} height={18} />
+          <span>Secure payments</span>
+        </div>
+        <div className="trust-strip__item">
+          <Icon.Headset width={18} height={18} />
+          <span>24/7 support</span>
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Recent transactions                                              */}
+      {/* ---------------------------------------------------------------- */}
+      <section className="data-card">
+        <h2 className="data-card__label">Recent data purchases</h2>
+
+        {transactions.length > 0 ? (
+          <div className="history-table">
+            <div className="history-table__row history-table__row--head">
+              <span>Network / Plan</span>
+              <span>Phone</span>
+              <span>Amount</span>
+              <span>Date</span>
+              <span>Status</span>
+            </div>
+
+            {transactions.map((txn) => {
+              const network = NETWORKS.find((n) => n.id === txn.network);
+              return (
+                <div className="history-table__row" key={txn.id}>
+                  <span className="history-table__plan">
+                    <span className="history-table__dot" style={{ backgroundColor: network?.color }} />
+                    {network?.name} · {txn.size}
+                  </span>
+                  <span>{txn.phone}</span>
+                  <span>₦{txn.amount.toLocaleString()}</span>
+                  <span className="history-table__date">{txn.date}</span>
+                  <span className={`status-badge status-badge--${txn.status}`}>
+                    {txn.status === "success" ? "Successful" : txn.status === "failed" ? "Failed" : "Pending"}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <Icon.Inbox width={40} height={40} className="empty-state__icon" />
+            <p className="empty-state__title">No purchases yet</p>
+            <p className="empty-state__text">Your data purchase history will show up here.</p>
+          </div>
+        )}
+      </section>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Buy modal                                                        */}
+      {/* ---------------------------------------------------------------- */}
+      {selectedPlan && (
+        <div className="modal-overlay" role="dialog" aria-modal="true" onClick={closeModal}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="modal__close" onClick={closeModal} aria-label="Close">
+              <Icon.Close width={18} height={18} />
+            </button>
+{purchaseStatus === "success" ? ( 
+  <div className="modal__state"> 
+    <span className="modal__state-icon modal__state-icon--success"> 
+      <Icon.Check width={26} height={26} /> 
+    </span> 
+
+    <h3>Purchase successful</h3> 
+
+    <p> 
+      {selectedPlan.size} was sent to {phoneNumber || "your number"}. A receipt has been saved to your 
+      history. 
+    </p> 
+
+    <button 
+      type="button" 
+      className="modal__primary-btn" 
+      onClick={closeModal} 
+    > 
+      Done 
+    </button> 
+  </div> 
+
+) : purchaseStatus === "pending" ? ( 
+
+  <div className="modal__state"> 
+    <span className="modal__state-icon modal__state-icon--loading"> 
+      <Icon.Clock width={26} height={26} /> 
+    </span> 
+
+    <h3>Purchase processing</h3> 
+
+    <p> 
+      Your data purchase is still being processed by the provider. 
+      Your wallet has been reserved and the transaction has been recorded. 
+    </p> 
+
+    <button 
+      type="button" 
+      className="modal__primary-btn" 
+      onClick={closeModal} 
+    > 
+      Done 
+    </button> 
+  </div> 
+
+) : purchaseStatus === "loading" ? ( 
+
+  <div className="modal__state"> 
+    <Icon.Spinner 
+      width={34} 
+      height={34} 
+      className="modal__state-icon modal__state-icon--loading" 
+    /> 
+
+    <h3>Processing your order</h3> 
+
+    <p> 
+      Please hold on while we confirm payment and deliver your data. 
+    </p> 
+  </div> 
+
+) : ( 
+
+  <> 
+    <h3 className="modal__title">Confirm purchase</h3> 
+
+    {purchaseStatus === "error" && ( 
+      <div className="modal__alert"> 
+        <Icon.Alert width={16} height={16} /> 
+        <span> 
+          {phoneNumber.trim().length < 11 
+            ? "Enter a valid 11-digit phone number to continue." 
+            : "We couldn't complete this purchase. Please try again."} 
+        </span> 
+      </div> 
+    )} 
+
+    <div className="modal__summary"> 
+      <div className="modal__summary-row"> 
+        <span>Network</span> 
+        <strong> 
+          {NETWORKS.find((n) => n.id === selectedPlan.network)?.name} 
+        </strong> 
+      </div> 
+
+      <div className="modal__summary-row"> 
+        <span>Plan</span> 
+        <strong>{selectedPlan.size}</strong> 
+      </div> 
+
+      <div className="modal__summary-row"> 
+        <span>Validity</span> 
+        <strong>{selectedPlan.validity}</strong> 
+      </div> 
+
+      <div className="modal__summary-row"> 
+        <span>Phone number</span> 
+        <strong>{phoneNumber || "Not entered"}</strong> 
+      </div> 
+
+      <div className="modal__summary-row modal__summary-row--total"> 
+        <span>Total</span> 
+        <strong>₦{selectedPlan.price.toLocaleString()}</strong> 
+      </div> 
+    </div> 
+
+    <button 
+      type="button" 
+      className="modal__primary-btn" 
+      onClick={confirmPurchase} 
+    > 
+      Pay ₦{selectedPlan.price.toLocaleString()} 
+    </button> 
+
+    <p className="modal__fine-print"> 
+      <Icon.Shield width={13} height={13} /> 
+      Payments are encrypted and processed securely. 
+    </p> 
+  </> 
+)}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,595 @@
+/* ==========================
+   TRANSACTION PAGE
+========================== */
+
+.transaction-page{
+    width:100%;
+    padding:30px;
+    display:flex;
+    flex-direction:column;
+    gap:25px;
+    background:#f8fafc;
+    min-height:100vh;
+}
+
+/* ==========================
+   HEADER
+========================== */
+
+.transaction-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.transaction-header h2{
+    font-size:30px;
+    font-weight:700;
+    color:#0f172a;
+    margin-bottom:6px;
+}
+
+.transaction-header p{
+    color:#64748b;
+    font-size:15px;
+}
+
+/* ==========================
+   SUMMARY
+========================== */
+
+.summary-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+}
+
+.summary-card{
+    background:#fff;
+    border-radius:18px;
+    padding:22px;
+    box-shadow:0 8px 25px rgba(0,0,0,.05);
+    transition:.35s;
+    border-left:5px solid #2563eb;
+}
+
+.summary-card:hover{
+    transform:translateY(-5px);
+}
+
+.summary-card h5{
+    color:#64748b;
+    font-size:14px;
+    margin-bottom:10px;
+    font-weight:500;
+}
+
+.summary-card h2{
+    color:#2563eb;
+    font-size:30px;
+    font-weight:700;
+}
+
+/* ==========================
+   SEARCH
+========================== */
+
+.transaction-search{
+    position:relative;
+}
+
+.transaction-search input{
+
+    width:100%;
+    height:55px;
+
+    border:none;
+
+    outline:none;
+
+    border-radius:15px;
+
+    background:#fff;
+
+    padding-left:55px;
+
+    padding-right:20px;
+
+    font-size:15px;
+
+    box-shadow:0 5px 20px rgba(0,0,0,.05);
+
+}
+
+.search-icon{
+
+    position:absolute;
+
+    left:20px;
+
+    top:18px;
+
+    font-size:18px;
+
+    color:#2563eb;
+
+}
+
+/* ==========================
+   FILTER BUTTONS
+========================== */
+
+.filter-buttons{
+
+display:flex;
+
+flex-wrap:wrap;
+
+gap:12px;
+
+}
+
+.filter-buttons button{
+
+border:none;
+
+cursor:pointer;
+
+padding:12px 22px;
+
+border-radius:30px;
+
+background:#fff;
+
+color:#334155;
+
+font-weight:600;
+
+transition:.3s;
+
+box-shadow:0 5px 15px rgba(0,0,0,.05);
+
+}
+
+.filter-buttons button:hover{
+
+background:#2563eb;
+
+color:#fff;
+
+}
+
+.filter-buttons .active{
+
+background:#2563eb;
+
+color:white;
+
+}
+
+/* ==========================
+   LOADING
+========================== */
+
+.loading-container{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(330px,1fr));
+
+gap:20px;
+
+}
+
+.loading-card{
+
+height:120px;
+
+border-radius:18px;
+
+background:linear-gradient(
+
+90deg,
+
+#edf2f7,
+
+#f8fafc,
+
+#edf2f7
+
+);
+
+background-size:300%;
+
+animation:loading 1.2s infinite;
+
+}
+
+@keyframes loading{
+
+0%{
+
+background-position:100%;
+
+}
+
+100%{
+
+background-position:-100%;
+
+}
+
+}
+/* ========================================
+   TRANSACTION LIST
+======================================== */
+
+.transaction-list{
+
+display:flex;
+
+flex-direction:column;
+
+gap:18px;
+
+margin-top:10px;
+
+}
+
+.transaction-card{
+
+background:#ffffff;
+
+border-radius:18px;
+
+padding:20px;
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+box-shadow:0 8px 20px rgba(15,23,42,.06);
+
+transition:.35s;
+
+border:1px solid rgba(37,99,235,.08);
+
+}
+
+.transaction-card:hover{
+
+transform:translateY(-5px);
+
+box-shadow:0 20px 35px rgba(37,99,235,.15);
+
+}
+
+.transaction-left{
+
+display:flex;
+
+align-items:center;
+
+gap:18px;
+
+}
+
+.transaction-icon{
+
+width:60px;
+
+height:60px;
+
+border-radius:50%;
+
+background:#2563eb;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+font-size:24px;
+
+color:white;
+
+flex-shrink:0;
+
+}
+
+.transaction-left h4{
+
+margin:0;
+
+font-size:18px;
+
+color:#0f172a;
+
+font-weight:700;
+
+}
+
+.transaction-left small{
+
+color:#64748b;
+
+font-size:13px;
+
+line-height:1.7;
+
+}
+
+.transaction-right{
+
+text-align:right;
+
+display:flex;
+
+flex-direction:column;
+
+gap:10px;
+
+align-items:flex-end;
+
+}
+
+.transaction-right h3{
+
+margin:0;
+
+font-size:24px;
+
+font-weight:700;
+
+color:#2563eb;
+
+}
+
+.transaction-right p{
+
+margin:0;
+
+font-size:13px;
+
+color:#64748b;
+
+}
+
+.transaction-right strong{
+
+color:#0f172a;
+
+font-size:16px;
+
+}
+
+/* ========================================
+   STATUS BADGES
+======================================== */
+
+.badge{
+
+display:flex;
+
+align-items:center;
+
+gap:6px;
+
+padding:8px 15px;
+
+border-radius:30px;
+
+font-size:13px;
+
+font-weight:600;
+
+text-transform:capitalize;
+
+}
+
+.success{
+
+background:#dcfce7;
+
+color:#15803d;
+
+}
+
+.pending{
+
+background:#fef3c7;
+
+color:#b45309;
+
+}
+
+.failed{
+
+background:#fee2e2;
+
+color:#dc2626;
+
+}
+
+/* ========================================
+   EMPTY STATE
+======================================== */
+
+.empty-state{
+
+background:#ffffff;
+
+border-radius:20px;
+
+padding:70px 30px;
+
+text-align:center;
+
+box-shadow:0 8px 20px rgba(15,23,42,.05);
+
+}
+
+.empty-state h1{
+
+font-size:70px;
+
+margin-bottom:15px;
+
+}
+
+.empty-state h3{
+
+font-size:26px;
+
+margin-bottom:10px;
+
+color:#0f172a;
+
+}
+
+.empty-state p{
+
+color:#64748b;
+
+font-size:15px;
+
+}
+
+/* ========================================
+   SCROLLBAR
+======================================== */
+
+::-webkit-scrollbar{
+
+width:8px;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+background:#2563eb;
+
+border-radius:10px;
+
+}
+
+::-webkit-scrollbar-track{
+
+background:#edf2f7;
+
+}
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media(max-width:992px){
+
+.transaction-page{
+
+padding:20px;
+
+}
+
+.transaction-card{
+
+flex-direction:column;
+
+align-items:flex-start;
+
+gap:18px;
+
+}
+
+.transaction-right{
+
+width:100%;
+
+align-items:flex-start;
+
+text-align:left;
+
+}
+
+.summary-grid{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+}
+
+@media(max-width:600px){
+
+.transaction-header h2{
+
+font-size:24px;
+
+}
+
+.summary-grid{
+
+grid-template-columns:1fr;
+
+}
+
+.summary-card{
+
+padding:18px;
+
+}
+
+.summary-card h2{
+
+font-size:24px;
+
+}
+
+.filter-buttons{
+
+overflow-x:auto;
+
+flex-wrap:nowrap;
+
+padding-bottom:5px;
+
+}
+
+.filter-buttons::-webkit-scrollbar{
+
+display:none;
+
+}
+
+.filter-buttons button{
+
+white-space:nowrap;
+
+}
+
+.transaction-icon{
+
+width:50px;
+
+height:50px;
+
+font-size:20px;
+
+}
+
+.transaction-left h4{
+
+font-size:16px;
+
+}
+
+.transaction-right h3{
+
+font-size:20px;
+
+}
+
+}
