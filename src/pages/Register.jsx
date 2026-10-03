@@ -22,49 +22,54 @@ function Register() {
       [e.target.name]: e.target.value, // FIXED: removed extra brackets
     });
   };
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log(formData);
+  console.log("Registration data:", formData);
 
-    setLoading(true);
-    setMessage("");
-    try {
-      const newFormData = new FormData();
-      newFormData.append("username", formData.username);
-      newFormData.append("email", formData.email);
-      newFormData.append("phone", formData.phone);
-      newFormData.append("password", formData.password);
-      newFormData.append("referral", formData.referral);
+  setLoading(true);
+  setMessage("");
 
-      const response = await fetch("http://beamaxtechpractical.online/API/register.php", {
+  try {
+    const newFormData = new FormData();
+
+    newFormData.append("username", formData.username);
+    newFormData.append("email", formData.email);
+    newFormData.append("phone", formData.phone);
+    newFormData.append("password", formData.password);
+    newFormData.append("referral", formData.referral);
+
+    const response = await fetch(
+      "http://beamaxtechpractical.online/API/register.php",
+      {
         method: "POST",
         body: newFormData,
-      });
-
-      const data = await response.json();
-      console.log(data);
-
-      if (response.ok) {
-        if (data.status === 'success') {
-          setMessage("successful");
-          localStorage.setItem('user', JSON.stringify(data.user));
-          navigate("/dashboard");
-        } else {
-          setMessage(data.message);
-        }
-        console.log(data);
-      } else {
-        setMessage("failed");
-        console.log(data);
       }
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-      setMessage("an error occurred");
-      setLoading(false);
+    );
+
+    const data = await response.json();
+
+    console.log("Registration response:", data);
+
+    if (data.success === true) {
+      // Save logged-in user
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      setMessage("successful");
+
+      // Go to dashboard
+      navigate("/dashboard");
+    } else {
+      setMessage(data.message || "Registration failed.");
     }
-  };
+
+  } catch (error) {
+    console.error("Registration error:", error);
+    setMessage("Unable to connect to the server.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="register-screen">

@@ -60,7 +60,9 @@ function Dashboard() {
     user = {};
 
   }
-
+const [balance, setBalance] = useState(
+  Number(user?.balance || 0)
+);
 
   /* ==============================
      LOAD DASHBOARD ANALYTICS
@@ -74,17 +76,13 @@ function Dashboard() {
 
     fetch(
       `http://beamaxtechpractical.online/API/dashboard_stats.php?user_id=${user.id}`
-    )
-      .then(response => response.json())
-      .then(result => {
+    ).then(result => {
+  if (result.success) {
+    setAnalytics(result.data);
 
-        if (result.success) {
-
-          setAnalytics(result.data);
-
-        }
-
-      })
+    setBalance(Number(result.data.balance || 0));
+  }
+})
       .catch(error => {
 
         console.error(
@@ -171,6 +169,51 @@ function Dashboard() {
 
   }, [user?.id]);
 
+  useEffect(() => {
+
+  if (!user?.id) {
+    return;
+  }
+
+  fetch(
+    `http://beamaxtechpractical.online/API/dashboard_stats.php?user_id=${user.id}`
+  )
+    .then(response => {
+
+      if (!response.ok) {
+        throw new Error(
+          `HTTP error! Status: ${response.status}`
+        );
+      }
+
+      return response.json();
+
+    })
+    .then(result => {
+
+      console.log("Dashboard API:", result);
+
+      if (result.success) {
+
+        setAnalytics(result.data);
+
+        setBalance(
+          Number(result.data.balance || 0)
+        );
+
+      }
+
+    })
+    .catch(error => {
+
+      console.error(
+        "Failed to load dashboard analytics:",
+        error
+      );
+
+    });
+
+}, [user?.id]);
 
   /* ==============================
      LOGOUT
@@ -189,10 +232,10 @@ function Dashboard() {
      USER VALUES
   ============================== */
 
-  const username = user?.username || "User";
+  // const username = user?.username || "User";
 
-  const balance = Number(user?.balance || 0);
-
+  // const balance = Number(user?.balance || 0);
+const username = user?.username || "User";
 
   /* ==============================
      TRANSACTION STATUS HELPER

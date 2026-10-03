@@ -433,22 +433,20 @@ export default function Wallet() {
 
       console.log("Balance update response:", data);
 
-      if (!response.ok || !data.success) {
-        alert(
-          data.message ||
-            "Payment was successful, but wallet update could not be completed."
-        );
-        return;
-      }
+if (!response.ok || data.status !== "success") {
+  alert(
+    data.message ||
+      "Payment was successful, but wallet update could not be completed."
+  );
+  return;
+}
 
-      const updatedBalance =
-        Number(user.balance || 0) + Number(activeAmount);
+const updatedBalance = Number(data.balance);
 
-      user.balance = updatedBalance;
+user.balance = updatedBalance;
+localStorage.setItem("user", JSON.stringify(user));
 
-      localStorage.setItem("user", JSON.stringify(user));
-
-      setBalance(updatedBalance);
+setBalance(updatedBalance);
 
       await getFundingHistory();
 
