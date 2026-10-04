@@ -1,7 +1,12 @@
-
+// import React, { useState, useMemo } from "react";
+import React, {
+  useState,
+  useMemo,
+  useEffect,
+  useRef,
+} from "react";
 import "./dataBundle.css";
 import "./dashboard.css";
-import React, { useState, useMemo, useRef, useEffect } from "react";
 
 
 /* -------------------------------------------------------------------------- */
@@ -1650,9 +1655,179 @@ export default function Data() {
   const [purchaseStatus, setPurchaseStatus] = useState("idle");
 // idle | loading | pending | success | error
   const [transactions, setTransactions] = useState(INITIAL_TRANSACTIONS);
+  ////////
+  const statusIntervalRef = useRef(null);
 
-  // Keeps track of the active data-status polling interval.
-  const dataStatusPollingRef = useRef(null);
+const stopStatusPolling = () => {
+  if (statusIntervalRef.current) {
+    clearInterval(statusIntervalRef.current);
+    statusIntervalRef.current = null;
+  }
+};
+
+const checkDataStatus = async (reference, token) => {
+  if (!reference || !token) {
+    return null;
+  }
+
+  try {
+    const response = await fetch(
+      "http://beamaxtechpractical.online/API/data_status.php",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          reference,
+        }),
+      }
+    );
+
+    const text = await response.text();
+
+    if (!text) {
+      return null;
+    }
+
+    let result;
+
+    try {
+      result = JSON.parse(text);
+    } catch (error) {
+      console.error("Invalid data status response:", text);
+      return null;
+    }
+
+    console.log("DATA STATUS RESPONSE:", result);
+
+    return result;
+  } catch (error) {
+    console.error("Data status check failed:", error);
+    return null;
+  }
+};
+
+const startDataStatusPolling = (
+  reference,
+  token,
+  transactionData
+) => {
+  if (!reference || !token) {
+    return;
+  }
+
+  stopStatusPolling();
+
+  let attempts = 0;
+
+  const check = async () => {
+    attempts++;
+
+    const result = await checkDataStatus(
+      reference,
+      token
+    );
+
+    if (!result) {
+      return;
+    }
+
+    /*
+     * SUCCESS
+     */
+    if (
+      result.success === true &&
+      result.status === "Success"
+    ) {
+      stopStatusPolling();
+
+      setPurchaseStatus("success");
+
+      setTransactions((prev) => [
+        {
+          id: reference,
+          network: transactionData.network,
+          size: transactionData.size,
+          phone: transactionData.phone,
+          amount: transactionData.amount,
+          status: "success",
+          date: "Just now",
+        },
+        ...prev.filter(
+          (item) => item.id !== reference
+        ),
+      ]);
+
+      return;
+    }
+
+    /*
+     * FAILED / REFUNDED
+     */
+    if (result.status === "Failed") {
+      stopStatusPolling();
+
+      setPurchaseStatus("error");
+
+      setTransactions((prev) => [
+        {
+          id: reference,
+          network: transactionData.network,
+          size: transactionData.size,
+          phone: transactionData.phone,
+          amount: transactionData.amount,
+          status: "failed",
+          date: "Just now",
+        },
+        ...prev.filter(
+          (item) => item.id !== reference
+        ),
+      ]);
+
+      return;
+    }
+
+    /*
+     * STILL PENDING
+     */
+    if (result.status === "Pending") {
+      setPurchaseStatus("pending");
+    }
+
+    /*
+     * Safety limit:
+     * 30 checks × 5 seconds = 2.5 minutes.
+     *
+     * The server transaction remains Pending,
+     * so the user can retry checking later.
+     */
+    if (attempts >= 30) {
+      stopStatusPolling();
+
+      console.log(
+        "Data status polling stopped after maximum attempts."
+      );
+    }
+  };
+
+  check();
+
+  statusIntervalRef.current = setInterval(
+    check,
+    5000
+  );
+};
+
+useEffect(() => {
+  return () => {
+    stopStatusPolling();
+  };
+}, []);
+
+/////////
 
   const activeNetwork = NETWORKS.find((n) => n.id === selectedNetwork);
 
@@ -1687,172 +1862,12 @@ export default function Data() {
   };
 
   const closeModal = () => {
-    setSelectedPlan(null);
-    setPurchaseStatus("idle");
-  };
- /*
-  |--------------------------------------------------------------------------
-  | DATA STATUS POLLING
-  |--------------------------------------------------------------------------
-  | Checks data_status.php until the provider reports Success or Failed.
-  | The backend performs the actual transaction/wallet reconciliation.
-  |--------------------------------------------------------------------------
-  */
+  stopStatusPolling();
 
-  const startDataStatusPolling = (reference) => {
-    if (!reference) {
-      console.error(
-        "Cannot start data status polling: transaction reference is missing."
-      );
-      return;
-    }
-
-    // Stop any previous polling before starting a new one.
-    if (dataStatusPollingRef.current) {
-      clearInterval(dataStatusPollingRef.current);
-      dataStatusPollingRef.current = null;
-    }
-
-    const checkStatus = async () => {
-      try {
-        const token = localStorage.getItem("authToken");
-
-        if (!token) {
-          console.error("DATA STATUS: authentication token not found.");
-          return;
-        }
-
-        const response = await fetch(
-          "http://beamaxtechpractical.online/API/data_status.php",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Accept": "application/json",
-              "Authorization": `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              reference: reference,
-            }),
-          }
-        );
-
-        const rawResponse = await response.text();
-
-        console.log("DATA STATUS HTTP STATUS:", response.status);
-        console.log("DATA STATUS RAW RESPONSE:", rawResponse);
-
-        if (!rawResponse.trim()) {
-          console.error("DATA STATUS returned an empty response.");
-          return;
-        }
-
-        let result;
-
-        try {
-          result = JSON.parse(rawResponse);
-        } catch (jsonError) {
-          console.error("DATA STATUS INVALID JSON:", jsonError);
-          console.error("DATA STATUS RAW RESPONSE:", rawResponse);
-          return;
-        }
-
-        console.log("DATA STATUS RESPONSE:", result);
-
-        const finalStatus = String(
-          result.status ??
-          result.data?.status ??
-          ""
-        ).toLowerCase();
-
-        /*
-        |--------------------------------------------------------------------------
-        | SUCCESS
-        |--------------------------------------------------------------------------
-        */
-
-        if (finalStatus === "success") {
-          setPurchaseStatus("success");
-
-          setTransactions((prev) =>
-            prev.map((txn) =>
-              txn.id === reference
-                ? {
-                    ...txn,
-                    status: "success",
-                  }
-                : txn
-            )
-          );
-
-          if (dataStatusPollingRef.current) {
-            clearInterval(dataStatusPollingRef.current);
-            dataStatusPollingRef.current = null;
-          }
-
-          console.log(
-            "DATA STATUS: transaction completed successfully."
-          );
-
-          return;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | FAILED
-        |--------------------------------------------------------------------------
-        */
-
-        if (finalStatus === "failed") {
-          setPurchaseStatus("error");
-
-          setTransactions((prev) =>
-            prev.map((txn) =>
-              txn.id === reference
-                ? {
-                    ...txn,
-                    status: "failed",
-                  }
-                : txn
-            )
-          );
-
-          if (dataStatusPollingRef.current) {
-            clearInterval(dataStatusPollingRef.current);
-            dataStatusPollingRef.current = null;
-          }
-
-          console.log("DATA STATUS: transaction failed.");
-
-          return;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | STILL PENDING
-        |--------------------------------------------------------------------------
-        */
-
-        console.log(
-          "DATA STATUS: transaction is still pending.",
-          result.provider_status || finalStatus || "unknown"
-        );
-      } catch (error) {
-        // A temporary status-check error must not mark the purchase failed.
-        console.error("DATA STATUS CHECK ERROR:", error);
-      }
-    };
-
-    // Check immediately.
-    checkStatus();
-
-    // Then check every 5 seconds.
-    dataStatusPollingRef.current = setInterval(
-      checkStatus,
-      5000
-    );
-  };
-
+  setSelectedPlan(null);
+  setPurchaseStatus("idle");
+};
+  ///////////////////////
  const confirmPurchase = async () => {
   if (!selectedPlan) {
     return;
@@ -1951,67 +1966,105 @@ if (!rawResponse.trim()) {
   |--------------------------------------------------------------------------
   */
 
-  if (
-    purchase.pending === true ||
-    purchase.status === "Pending"
-  ) {
-    setPurchaseStatus("pending");
+  // if (
+  //   purchase.pending === true ||
+  //   purchase.status === "Pending"
+  // ) {
+  //   setPurchaseStatus("pending");
 
-    const transactionReference =
-      purchase.reference ||
-      purchase.transaction_reference ||
-      result.reference ||
-      result.transaction_reference;
+  //   setTransactions((prev) => [
+  //     {
+  //       id: purchase.reference || `TXN-${Date.now()}`,
+  //       network: selectedPlan.network,
+  //       size: selectedPlan.size,
+  //       phone: `${phoneNumber.slice(0, 4)}•••${phoneNumber.slice(-4)}`,
+  //       amount: Number(
+  //         purchase.amount ?? selectedPlan.price
+  //       ),
+  //       status: "pending",
+  //       date: "Just now",
+  //     },
+  //     ...prev,
+  //   ]);
 
-    setTransactions((prev) => [
-      {
-        id: transactionReference || `TXN-${Date.now()}`,
-        network: selectedPlan.network,
-        size: selectedPlan.size,
-        phone: `${phoneNumber.slice(0, 4)}•••${phoneNumber.slice(-4)}`,
-        amount: Number(
-          purchase.amount ?? selectedPlan.price
-        ),
-        status: "pending",
-        date: "Just now",
-      },
-      ...prev,
-    ]);
+  //   return;
+  // }
 
-    /*
-    |--------------------------------------------------------------------------
-    | START DATA STATUS POLLING
-    |--------------------------------------------------------------------------
-    */
+  // /*
+  // |--------------------------------------------------------------------------
+  // | Failed
+  // |--------------------------------------------------------------------------
+  // */
 
-    if (transactionReference) {
-      startDataStatusPolling(transactionReference);
-    } else {
-      console.error(
-        "Data purchase is pending, but no transaction reference was returned.",
-        result
-      );
-    }
+  // if (!response.ok || result.success !== true) {
+  //   console.error(
+  //     "DATA PURCHASE FAILED:",
+  //     result.message || "Unknown error"
+  //   );
 
-    return;
-  }
+  //   setPurchaseStatus("error");
+  //   return;
+  // }
+////////
+if (
+  purchase.pending === true ||
+  purchase.status === "Pending"
+) {
+  const reference =
+    purchase.reference ||
+    purchase.transaction_reference ||
+    purchase.transaction_id;
 
-  /*
-  |--------------------------------------------------------------------------
-  | Failed
-  |--------------------------------------------------------------------------
-  */
-
-  if (!response.ok || result.success !== true) {
+  if (!reference) {
     console.error(
-      "DATA PURCHASE FAILED:",
-      result.message || "Unknown error"
+      "Pending data purchase did not return a transaction reference:",
+      result
     );
 
     setPurchaseStatus("error");
     return;
   }
 
+  const transactionData = {
+    network: selectedPlan.network,
+    size: selectedPlan.size,
+    phone: phoneNumber,
+    amount: Number(
+      purchase.amount ?? selectedPlan.price
+    ),
+  };
+
+  setPurchaseStatus("pending");
+
+  setTransactions((prev) => [
+    {
+      id: reference,
+      network: selectedPlan.network,
+      size: selectedPlan.size,
+      phone: `${phoneNumber.slice(0, 4)}•••${phoneNumber.slice(-4)}`,
+      amount: Number(
+        purchase.amount ?? selectedPlan.price
+      ),
+      status: "pending",
+      date: "Just now",
+    },
+    ...prev.filter(
+      (item) => item.id !== reference
+    ),
+  ]);
+
+  /*
+   * Start checking data_status.php
+   */
+  startDataStatusPolling(
+    reference,
+    token,
+    transactionData
+  );
+
+  return;
+}
+///
   /*
   |--------------------------------------------------------------------------
   | Success
@@ -2040,21 +2093,6 @@ if (!rawResponse.trim()) {
   setPurchaseStatus("error");
 }
 };
-  /*
-  |--------------------------------------------------------------------------
-  | CLEAN UP POLLING WHEN COMPONENT UNMOUNTS
-  |--------------------------------------------------------------------------
-  */
-
-  useEffect(() => {
-    return () => {
-      if (dataStatusPollingRef.current) {
-        clearInterval(dataStatusPollingRef.current);
-        dataStatusPollingRef.current = null;
-      }
-    };
-  }, []);
-
   return (
     <div className="data-page">
       {/* ---------------------------------------------------------------- */}
